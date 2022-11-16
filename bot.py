@@ -66,16 +66,60 @@ def validate_channel(channel_id):
 def send_message(channel_id, message):
     http = requests.post(f"https://discord.com/api/v9/channels/{channel_id}/messages", headers={"Authorization": TOKEN}, json={"content": message})
 
+def get_textlist():
+    if not os.path.exists("textlistpath.txt"):
+        while True:
+            path = input("Path: ").strip()
+            if not os.path.exists(path):
+                print("Error: Path does not exist.")
+                continue
+            break
+
+        with open("textlistpath.txt", "w") as file:
+            file.write(path)
+            file.close()
+        
+    with open("textlistpath.txt", "r") as file:
+        path = file.read().strip()
+        file.close()
+    
+    print(f"Select a text list file.\n")
+
+    for file in os.listdir(path):
+        file_path = f"{path}/{file}"
+        if os.path.isfile(file_path):
+            print(file)
+    
+    print()
+
+    while True:
+        while True:
+            filename = input("Filename: ").strip()
+            file_path = f"{path}/{filename}"
+            if not os.path.isfile(file_path):
+                print(f"Erorr: Invalid file. Try again.")
+                continue
+            break
+        
+        with open(file_path, "rb") as file:
+            textlist = [i.decode() for i in file.read().strip().splitlines()]
+            file.close()
+        
+        if len(textlist) <= 0:
+            print("Error: Text List is empty. Try another file.")
+            continue
+
+        break
+    
+    return textlist
+
 def main():
     global TOKEN
 
-    if not os.path.exists("textlist.txt"):
-        print("Error: textlist.txt file not found")
+    try:
+        textlist = get_textlist()
+    except KeyboardInterrupt:
         return
-    
-    with open("textlist.txt", "rb") as file:
-        textlist = [i.decode() for i in file.read().strip().splitlines()]
-        file.close()
 
     try:
         token = get_token()
