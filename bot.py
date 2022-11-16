@@ -83,7 +83,7 @@ def get_textlist():
         path = file.read().strip()
         file.close()
     
-    print(f"Select a text list file.\n")
+    print(f"Select text list file.\n")
 
     for file in os.listdir(path):
         file_path = f"{path}/{file}"
@@ -113,11 +113,32 @@ def get_textlist():
     
     return textlist
 
+def get_shuffle_mode():
+    print("\nSelect shuffle mode.\n\n1 - Shuffle\n2 - No Shuffle\n")
+    shuffle_modes = [1, 2]
+
+    while True:
+        try:
+            shuffle_mode = int(input("Shuffle Mode: "))
+            if not shuffle_mode in shuffle_modes:
+                raise Exception
+        except Exception:
+            print("Error: Invalid shuffle mode.")
+            continue
+        break
+
+    return shuffle_mode
+
 def main():
     global TOKEN
 
     try:
         textlist = get_textlist()
+    except KeyboardInterrupt:
+        return
+
+    try:
+        shuffle_mode = get_shuffle_mode()
     except KeyboardInterrupt:
         return
 
@@ -159,7 +180,8 @@ def main():
     
     try:
         while True:
-            random.shuffle(textlist)
+            if shuffle_mode == 1:
+                random.shuffle(textlist)
             
             for text in textlist:
                 try:
